@@ -2,8 +2,9 @@ import uuid
 from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from db import items
 
+from db import items
+from schemas import ItemSchema, ItemUpdateSchema
 
 blp = Blueprint("Items", __name__, description="Operations on Items")
 
@@ -21,11 +22,8 @@ class Item(MethodView):
             return {"message": "item deleted"}
         abort(404, message="item not found.")
 
-    def put(self, item_id):
-        item_data = request.get_json()
-        if "name" not in item_data or "price" not in item_data:
-            abort(400, message="Bad request. Ensure 'name' & 'price' are included in the JSON payload.")
-
+    @blp.arguments(ItemUpdateSchema)
+    def put(self, item_data, item_id):
         if item := items.get(item_id):
             item["price"] = item_data["price"]
             item["name"] = item_data["name"]
@@ -38,11 +36,8 @@ class ItemList(MethodView):
     def get(self):
         return {"items": list(items.values())}
 
-    def post(self):
-        item_data = request.get_json()
-        if "name" not in item_data:
-            abort(400, message="Bad request. Ensure 'name' is included in the JSON payload.")
-
+    @blp.arguments(ItemSchema)
+    def post(self, item_data):
         for item in items.values():
             if item.get("name") == item_data.get("name"):
                 abort(400, message="item already exist.")
