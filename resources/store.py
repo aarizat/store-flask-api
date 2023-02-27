@@ -1,5 +1,3 @@
-import uuid
-from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -8,7 +6,7 @@ from db import db
 from models import StoreModel
 from schemas import StoreSchema
 
-blp = Blueprint("Stores", __name__, description="Operations on Stores")
+blp = Blueprint("Stores", "stores", description="Operations on Stores")
 
 
 @blp.route("/stores/<string:store_id>")
