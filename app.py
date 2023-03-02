@@ -3,6 +3,7 @@ import os
 from flask import Flask, jsonify
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 
 from db import db
 from blocklist import BLOCKLIST
@@ -28,10 +29,9 @@ def create_app(db_url=None):
     app.config["SQLALCHEMY_TRACK_NOTIFICATIONS"] = False
     db.init_app(app)
 
-    with app.app_context():
-        db.create_all()
-
     api = Api(app)
+
+    migrate = Migrate(app=app, db=db)
 
     app.config["JWT_SECRET_KEY"] = "Andres"
     jwt = JWTManager(app)
